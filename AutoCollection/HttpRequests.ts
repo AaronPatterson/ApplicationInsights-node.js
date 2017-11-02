@@ -208,6 +208,14 @@ class AutoCollectHttpRequests {
             });
         }
 
+        // Track requests where the client closed the connection before completing.
+        if (request.on) {
+            request.on("close", () => {
+                response.statusCode = 499 // Client Closed Request
+                AutoCollectHttpRequests.endRequest(client, requestParser, request, response, null, properties, null);
+            });
+        }
+        
         // track a failed request if an error is emitted
         if (request.on) {
             request.on("error", (error:any) => {
